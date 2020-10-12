@@ -26,6 +26,8 @@ public class TimelineActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeContainer;
     List<Tweet> tweets;
     TweetsAdapter adapter;
+    EndlessRecyclerViewScrollListener scrollListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +59,49 @@ public class TimelineActivity extends AppCompatActivity {
         //init list of tweets and adapter
         tweets = new ArrayList<>();
         adapter = new TweetsAdapter(this, tweets);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         //set up recycler view: layout manager + adapter
-        rvTweets.setLayoutManager(new LinearLayoutManager(this));
+        rvTweets.setLayoutManager(layoutManager);
         rvTweets.setAdapter(adapter);
+
+        scrollListener =  new EndlessRecyclerViewScrollListener(layoutManager) {
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.i(TAG, "onLoadMore" + page);
+                loadMoreData();
+            }
+        };
+        //adds scroll listener to recyclerview
+        rvTweets.addOnScrollListener(scrollListener);
+
         populateHomeTimeline();
+
+    }
+
+    private void loadMoreData() {
+        //send API request to retrieve appropriate paginated data
+        restClient.getNextPageOfTweets(new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json) {
+                Log.i(TAG, "onSuccess for load more data");
+                //deserialize and construct new model objects from API response
+                JSONArray jsonArray = json.jsonArray;
+                try {
+                    //append new data objects to existing set of items inside the array of items
+                    //notify adapter of new items made with notifyItemRangeInserted()
+                    List<Tweet> tweets = Tweet.fromJsonArray(jsonArray);
+                    adapter.addAll(tweets);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                Log.i(TAG, "onFailure for load more data");
+            }
+        }, tweets.get(tweets.size() -1).id);
 
     }
 
