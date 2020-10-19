@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:backgroundTint="#FFFFFF"
     tools:context=".ComposeActivity">
 
     <Button
@@ -14,7 +16,9 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
-        android:text="Tweet" />
+        android:backgroundTint="#00bfff"
+        android:text="Tweet"
+        android:textColor="#FFFFFF" />
 
     <EditText
         android:id="@+id/etCompose"
@@ -31,5 +35,21 @@
         android:gravity="start|top"
         android:hint="What's happening?"
         android:inputType="textMultiLine"
+        android:maxLength="280"
         android:minLines="5" />
+
+    <TextView
+        android:id="@+id/tvWordCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etCompose"
+        android:layout_alignTop="@id/btnTweet"
+        android:layout_alignBottom="@id/btnTweet"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toStartOf="@+id/btnTweet"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        tools:text="0/140" />
 </RelativeLayout>
